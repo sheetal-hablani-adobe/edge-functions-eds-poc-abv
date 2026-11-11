@@ -16,8 +16,8 @@ import * as response from './lib/response.js';
 import { log } from './lib/log.js';
 import { weatherHandler } from "./weather.js";
 
-// Browser origins allowed to read responses (CORS): the bv-poc-dynamic site on any branch + local dev
-const SITE_HOST = /^[a-z0-9-]+--bv-poc-dynamic--sheetal-hablani-adobe\.aem\.(page|live)$/;
+// Browser origins allowed to read responses (CORS): bv-poc-dynamic / bv-poc-dynamic-wknd on any branch + local dev
+const SITE_HOST = /^[a-z0-9-]+--bv-poc-dynamic(-wknd)?--sheetal-hablani-adobe\.aem\.(page|live)$/;
 
 function isAllowedOrigin(origin) {
   if (!origin) return false;
