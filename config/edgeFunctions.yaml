@@ -4,6 +4,8 @@ data:
   functions:
     - name: my-edge-function
     - name: my-edge-function-b
+    # Test slot: deploy any branch here to try it on its own debug URL without touching A or B
+    - name: my-edge-function-test
   # Uncomment to enable secrets
   # secrets:
   #   - key: API_TOKEN
