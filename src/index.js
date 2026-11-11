@@ -16,17 +16,47 @@ import * as response from './lib/response.js';
 import { log } from './lib/log.js';
 import { weatherHandler } from "./weather.js";
 
+// Browser origins allowed to read responses (CORS): the bv-poc-dynamic site on any branch + local dev
+const SITE_HOST = /^[a-z0-9-]+--bv-poc-dynamic--sheetal-hablani-adobe\.aem\.(page|live)$/;
+
+function isAllowedOrigin(origin) {
+  if (!origin) return false;
+  try {
+    const { protocol, hostname, port } = new URL(origin);
+    if (protocol === "http:" && ["localhost", "127.0.0.1"].includes(hostname) && port === "3000") return true;
+    return protocol === "https:" && SITE_HOST.test(hostname);
+  } catch {
+    return false;
+  }
+}
+
+function withCors(res, origin) {
+  const headers = new Headers(res.headers);
+  if (isAllowedOrigin(origin)) {
+    headers.set("Access-Control-Allow-Origin", origin);
+    headers.set("Access-Control-Allow-Methods", "GET, OPTIONS");
+    headers.set("Access-Control-Allow-Headers", "Content-Type");
+    headers.set("Access-Control-Max-Age", "86400");
+  }
+  headers.append("Vary", "Origin");
+  return new Response(res.body, { status: res.status, statusText: res.statusText, headers });
+}
+
 addEventListener("fetch", (event) => event.respondWith(handleRequest(event)));
 
 async function handleRequest(event) {
   const req = event.request;
   const url = new URL(req.url);
+  const origin = req.headers.get("Origin");
 
   let finalResponse;
 
   try {
     // Route matching
-    if (url.pathname === "/" && req.method === "GET") {
+    if (req.method === "OPTIONS") {
+      // Browser pre-flight check (CORS)
+      finalResponse = new Response(null, { status: 204 });
+    } else if (url.pathname === "/" && req.method === "GET") {
       finalResponse = new Response("Hello World from the edge!", { status: 200 });
     } else if (url.pathname === "/hello-world" && req.method === "GET") {
       finalResponse = new Response("Hello World from the edge!", { status: 200 });
@@ -39,6 +69,8 @@ async function handleRequest(event) {
     console.log(err);
     finalResponse = response.error();
   }
+
+  finalResponse = withCors(finalResponse, origin);
 
   // Log the request and response
   log(req, finalResponse);
