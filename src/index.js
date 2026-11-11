@@ -57,9 +57,9 @@ async function handleRequest(event) {
       // Browser pre-flight check (CORS)
       finalResponse = new Response(null, { status: 204 });
     } else if (url.pathname === "/" && req.method === "GET") {
-      finalResponse = new Response("Hello World from the edge!", { status: 200 });
+      finalResponse = new Response("Hello World from the edge from Sheetal!", { status: 200 });
     } else if (url.pathname === "/hello-world" && req.method === "GET") {
-      finalResponse = new Response("Hello World from the edge!", { status: 200 });
+      finalResponse = new Response("Hello World from the edge from Sheetal!", { status: 200 });
     } else if (url.pathname === "/weather" && req.method === "GET") {
       finalResponse = await weatherHandler(req, event.client);
     } else {
