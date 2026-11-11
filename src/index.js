@@ -15,6 +15,7 @@ governing permissions and limitations under the License.
 import * as response from './lib/response.js';
 import { log } from './lib/log.js';
 import { weatherHandler } from "./weather.js";
+import { env } from "fastly:env";
 
 // Browser origins allowed to read responses (CORS): the bv-poc-dynamic-wknd site on any branch + local dev
 const SITE_HOST = /^[a-z0-9-]+--bv-poc-dynamic-wknd--sheetal-hablani-adobe\.aem\.(page|live)$/;
@@ -37,6 +38,7 @@ function withCors(res, origin) {
     headers.set("Access-Control-Allow-Methods", "GET, OPTIONS");
     headers.set("Access-Control-Allow-Headers", "Content-Type");
     headers.set("Access-Control-Max-Age", "86400");
+    headers.set("Access-Control-Expose-Headers", "x-edge-service-id, x-edge-pop");
   }
   headers.append("Vary", "Origin");
   return new Response(res.body, { status: res.status, statusText: res.statusText, headers });
@@ -60,6 +62,8 @@ async function handleRequest(event) {
       finalResponse = new Response("Hello World from the edge!", { status: 200 });
     } else if (url.pathname === "/hello-world" && req.method === "GET") {
       finalResponse = new Response("Hello World from the edge!", { status: 200 });
+    } else if (url.pathname === "/v2/hello-world" && req.method === "GET") {
+      finalResponse = new Response(`Hello from /v2 – edge service ${env("FASTLY_SERVICE_ID")}`, { status: 200 });
     } else if (url.pathname === "/weather" && req.method === "GET") {
       finalResponse = await weatherHandler(req, event.client);
     } else {
@@ -71,6 +75,10 @@ async function handleRequest(event) {
   }
 
   finalResponse = withCors(finalResponse, origin);
+
+  // Shows which edge function (Fastly service) and CDN location answered, to verify routing rules
+  finalResponse.headers.set("x-edge-service-id", env("FASTLY_SERVICE_ID") || "local");
+  finalResponse.headers.set("x-edge-pop", env("FASTLY_POP") || "local");
 
   // Log the request and response
   log(req, finalResponse);

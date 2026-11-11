@@ -3,6 +3,7 @@ version: "1"
 data:
   functions:
     - name: my-edge-function
+    - name: my-edge-function-b
   # Uncomment to enable secrets
   # secrets:
   #   - key: API_TOKEN

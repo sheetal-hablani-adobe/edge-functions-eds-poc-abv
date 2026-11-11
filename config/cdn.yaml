@@ -25,3 +25,9 @@ data:
         action:
           type: selectAemOrigin
           originName: edgefunction-my-edge-function
+      # Path routing: /v2/hello-world is answered by the second edge function (B) on the same CDN
+      - name: route-v2-hello-world-to-edge-function-b
+        when: { reqProperty: path, equals: "/v2/hello-world" }
+        action:
+          type: selectAemOrigin
+          originName: edgefunction-my-edge-function-b
