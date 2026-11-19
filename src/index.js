@@ -38,6 +38,8 @@ function withCors(res, origin) {
     headers.set("Access-Control-Allow-Methods", "GET, OPTIONS");
     headers.set("Access-Control-Allow-Headers", "Content-Type");
     headers.set("Access-Control-Max-Age", "86400");
+    // let the page read the CDN cache headers (caching demo)
+    headers.set("Access-Control-Expose-Headers", "x-cache, x-cache-hits, age");
   }
   headers.append("Vary", "Origin");
   return new Response(res.body, { status: res.status, statusText: res.statusText, headers });
