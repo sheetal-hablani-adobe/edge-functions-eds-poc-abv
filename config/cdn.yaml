@@ -13,8 +13,20 @@ data:
           - type: set
             queryParam: ip
             value: { reqProperty: clientIp }
+      # /api/nearby is personal (nearest adventures to the visitor): one cache entry per visitor IP
+      - name: add-client-ip-to-nearby
+        when: { reqProperty: path, equals: "/api/nearby" }
+        actions:
+          - type: set
+            queryParam: ip
+            value: { reqProperty: clientIp }
   originSelectors:
     rules:
+      - name: route-nearby-to-edge-function
+        when: { reqProperty: path, equals: "/api/nearby" }
+        action:
+          type: selectAemOrigin
+          originName: edgefunction-my-edge-function
       - name: route-weather-to-edge-function
         when: { reqProperty: path, equals: "/weather" }
         action:

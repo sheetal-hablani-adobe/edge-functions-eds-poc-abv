@@ -15,6 +15,7 @@ governing permissions and limitations under the License.
 import * as response from './lib/response.js';
 import { log } from './lib/log.js';
 import { weatherHandler } from "./weather.js";
+import { nearbyHandler } from "./nearby.js";
 
 // Browser origins allowed to read responses (CORS): the bv-poc-dynamic-wknd site on any branch + local dev
 const SITE_HOST = /^[a-z0-9-]+--bv-poc-dynamic-wknd--sheetal-hablani-adobe\.aem\.(page|live)$/;
@@ -62,6 +63,9 @@ async function handleRequest(event) {
       finalResponse = new Response("Hello World from the edge from Sheetal!", { status: 200 });
     } else if (url.pathname === "/weather" && req.method === "GET") {
       finalResponse = await weatherHandler(req, event.client);
+    } else if (url.pathname === "/api/nearby" && req.method === "GET") {
+      // Caching demo: nearest WKND adventures to the visitor (fetch cache + CDN cache)
+      finalResponse = await nearbyHandler(req, event.client);
     } else {
       finalResponse = response.notFound();
     }
