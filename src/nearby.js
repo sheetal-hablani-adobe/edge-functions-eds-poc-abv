@@ -41,7 +41,7 @@ export async function nearbyHandler(req, client) {
   const indexFetchMs = Date.now() - started;
   console.log(`query-index.json fetched in ${indexFetchMs} ms`);
 
-  // Layer 2 – CDN cache: browser 60 s, CDN 5 min (per visitor IP via the cdn.yaml ip rule)
+  // Layer 2 – CDN cache: 5 min (per visitor IP via the cdn.yaml ip rule); browser 0 s so every click asks the CDN
   return json({
     city: geo.city,
     country: geo.country_code,
@@ -49,5 +49,5 @@ export async function nearbyHandler(req, client) {
     generatedAt: new Date().toISOString(),
     pop: env("FASTLY_POP") || "local",
     indexFetchMs,
-  }, "public, max-age=60, s-maxage=300");
+  }, "public, max-age=0, s-maxage=300");
 }
